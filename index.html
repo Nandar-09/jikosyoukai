@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>自己紹介フォーム</title>
+  
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      background-color: #f7f9fc;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .form-container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #555;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box; /* paddingを含めた幅にする */
+      font-size: 16px;
+    }
+    textarea {
+      resize: vertical;
+    }
+    input:focus,
+    textarea:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .success {
+      color: #27ae60;
+    }
+    .error {
+      color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>自己紹介フォーム</h2>
+    <form id="profileForm" onsubmit="handleFormSubmit(event)">
+      
+      <div class="form-group">
+        <label for="name">名前・ニックネーム</label>
+        <input type="text" id="name" name="name" placeholder="例: 太郎" required>
+      </div>
+
+      <div class="form-group">
+        <label for="country">出身国</label>
+        <input type="text" id="country" name="country" placeholder="例: 日本" required>
+      </div>
+
+      <div class="form-group">
+        <label for="holiday">休日の過ごし方</label>
+        <textarea id="holiday" name="holiday" rows="4" placeholder="例: 映画鑑賞や読書をして過ごします。" required></textarea>
+      </div>
+
+      <button type="submit" id="submitBtn">送信する</button>
+      <div id="message" class="message"></div>
+      
+    </form>
+  </div>
+
+  <script>
+    function handleFormSubmit(event) {
+      event.preventDefault(); // 画面遷移（リロード）を防ぐ
+
+      const form = document.getElementById('profileForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const messageDiv = document.getElementById('message');
+
+      // 送信中のボタン状態変更（連打防止）
+      submitBtn.disabled = true;
+      submitBtn.textContent = '送信中...';
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
+
+      // GASの関数 'saveData' を呼び出し
+      google.script.run
+        .withSuccessHandler(function(response) {
+          // 成功した時の処理
+          messageDiv.textContent = '送信が完了しました！ありがとうございます。';
+          messageDiv.classList.add('success');
+          form.reset(); // フォームをクリア
+          resetButton(submitBtn);
+        })
+        .withFailureHandler(function(error) {
+          // エラーが起きた時の処理
+          messageDiv.textContent = 'エラーが発生しました: ' + error.message;
+          messageDiv.classList.add('error');
+          resetButton(submitBtn);
+        })
+        .saveData(form); // フォーム全体をGASに渡す
+    }
+
+    // ボタンの状態を元に戻す関数
+    function resetButton(btn) {
+      btn.disabled = false;
+      btn.textContent = '送信する';
+    }
+  </script>
+
+</body>
+</html>
