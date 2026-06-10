@@ -118,44 +118,40 @@
     </form>
   </div>
 
-  <script>
-    function handleFormSubmit(event) {
-      event.preventDefault(); // 画面遷移（リロード）を防ぐ
+<script>
+  const GAS_URL = "https://script.google.com/a/macros/tsb-yyg.ac.jp/s/AKfycbx0iwNu2TqfA9-ku2z90JjvFp194y31Xm26J6TJX9sK5dA9_YOzXG_R_qjRHoUf-Jk/exec";
 
-      const form = document.getElementById('profileForm');
-      const submitBtn = document.getElementById('submitBtn');
-      const messageDiv = document.getElementById('message');
+  function handleFormSubmit(event) {
+    event.preventDefault();
 
-      // 送信中のボタン状態変更（連打防止）
-      submitBtn.disabled = true;
-      submitBtn.textContent = '送信中...';
-      messageDiv.textContent = '';
-      messageDiv.className = 'message';
+    const form = document.getElementById('profileForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageDiv = document.getElementById('message');
 
-      // GASの関数 'saveData' を呼び出し
-      google.script.run
-        .withSuccessHandler(function(response) {
-          // 成功した時の処理
-          messageDiv.textContent = '送信が完了しました！ありがとうございます。';
-          messageDiv.classList.add('success');
-          form.reset(); // フォームをクリア
-          resetButton(submitBtn);
-        })
-        .withFailureHandler(function(error) {
-          // エラーが起きた時の処理
-          messageDiv.textContent = 'エラーが発生しました: ' + error.message;
-          messageDiv.classList.add('error');
-          resetButton(submitBtn);
-        })
-        .saveData(form); // フォーム全体をGASに渡す
-    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中...';
+    messageDiv.textContent = '';
 
-    // ボタンの状態を元に戻す関数
-    function resetButton(btn) {
-      btn.disabled = false;
-      btn.textContent = '送信する';
-    }
-  </script>
+    const data = {
+      name: form.name.value,
+      country: form.country.value,
+      holiday: form.holiday.value
+    };
+
+    fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data)
+    });
+
+    messageDiv.textContent = '送信しました！';
+    messageDiv.classList.add('success');
+    form.reset();
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = '送信する';
+  }
+</script>
 
 </body>
 </html>
